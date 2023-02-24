@@ -1,0 +1,72 @@
+---
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/dotNET-Core.gitlab-ci.yml
+image: mcr.microsoft.com/dotnet/sdk:6.0
+variables:
+  DIR_SOURCE: 'src'
+  DIR_PROJECT: '*/'
+  DIR_OBJECTS: 'obj'
+  BUILD_CONFIG: 'Release'
+  PATH_BUILD: 'build'
+cache:
+  key: "${CI_JOB_STAGE}-${CI_COMMIT_REF_SLUG}"
+  paths:
+    - '${DIR_SOURCE}/${DIR_PROJECT}/${DIR_OBJECTS}/project.assets.json'
+    - '${DIR_SOURCE}/${DIR_PROJECT}/${DIR_OBJECTS}/*.csproj.nuget.*'
+  policy: pull-push
+
+# build artifacts
+build:
+  stage: build
+  tags:
+    - docker
+  before_script:
+    # need to install make to make use of the Makefile rather than running dotnet commands directly
+    # force IPv4 since current tagged build environment has IPv6 routing issues
+    - 'apt -o Acquire::ForceIPv4=true update'
+    - 'apt -o Acquire::ForceIPv4=true install make'
+  script:
+    - 'make -C ${DIR_SOURCE} build'
+    - 'make -C ${DIR_SOURCE} pack'
+  artifacts:
+    paths:
+      - ${DIR_SOURCE}/${PATH_BUILD}
+
+# run code tests
+tests:
+  stage: test
+  tags:
+    - docker
+  before_script:
+    # need to install make to make use of the Makefile rather than running dotnet commands directly
+    # force IPv4 since current tagged build environment has IPv6 routing issues
+    - 'apt -o Acquire::ForceIPv4=true update'
+    - 'apt -o Acquire::ForceIPv4=true install make'
+  script:
+    - 'make -C ${DIR_SOURCE} test'
+
+# publish NuGet package artifacts if main branch
+publish_nuget:
+  stage: deploy
+  tags:
+    - docker
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    # push NuGet package artifacts from build:build stage
+    - 'dotnet nuget add source "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password ${CI_JOB_TOKEN} --store-password-in-clear-text'
+    - 'dotnet nuget push "${DIR_SOURCE}/${PATH_BUILD}/*.nupkg" --source gitlab'
+
+# create GitLab release if main branch and commit is tagged
+release:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  tags:
+    - docker
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG
+  script:
+    - echo 'running release_job'
+  release:
+    tag_name: '${CI_COMMIT_TAG}'
+    description: '${CI_COMMIT_TAG}'
+...
