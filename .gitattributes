@@ -2,3 +2,4 @@
 *.md            text diff=markdown
 .gitattributes  text export-ignore
 .gitignore      text export-ignore
+Makefile        text eol=lf

@@ -1,0 +1,38 @@
+---
+name: Build
+on:
+  push:
+    branches: [ main ]
+env:
+  PATH_SOURCE: src
+  PATH_BUILD: build
+  BUILD_CONFIG: Release
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    - uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget
+    - name: Build
+      run: make build
+      working-directory: ${{ env.PATH_SOURCE }}
+    - name: Test
+      run: make test
+      working-directory: ${{ env.PATH_SOURCE }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
+...
