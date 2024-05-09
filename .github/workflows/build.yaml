@@ -41,3 +41,4 @@ jobs:
         shell: bash
         run: |
           gpr push ${{ env.PATH_BUILD }}/ExtendedProcess.Library.csproj/ExtendedProcess.Library.*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ env.PATH_SOURCE }}
