@@ -1,12 +1,12 @@
 # ExtendedProcess .NET
-_ExtendedProcess_ is a .NET 6.0 library written in C# for interacting with process windows on Windows. The solution contains 2 projects:
+_ExtendedProcess_ is a .NET 8.0 library written in C# for interacting with process windows on Windows. The solution contains 2 projects:
 * `ExtendedProcess.Library`: The primary library that can be referenced to interact with process windows.
 * `ExtendedProcess.TestAppWinForms`: A Windows application that mimics the design of [AutoHotkey's Window Spy](https://amourspirit.github.io/AutoHotkey-Snippit/WindowSpy.html).  
 ![Window Spy](docs/window_spy.png)
 
 # Building
 ## Requirements
-* .NET 6.0
+* .NET 8.0
 
 ## Build
 ### Manual
