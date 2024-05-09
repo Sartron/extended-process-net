@@ -49,7 +49,7 @@ public static class Cursor
     ///     Returns the window at the given screen coordinates.
     /// </summary>
     /// <param name="position">
-    /// Screen coordinates.
+    ///     Screen coordinates.
     /// </param>
     public static ProcessWindow? GetWindowAtPoint(Point position)
     {

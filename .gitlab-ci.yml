@@ -1,6 +1,6 @@
 ---
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/dotNET-Core.gitlab-ci.yml
-image: mcr.microsoft.com/dotnet/sdk:6.0
+image: mcr.microsoft.com/dotnet/sdk:8.0
 variables:
   DIR_SOURCE: 'src'
   DIR_PROJECT: '*/'
