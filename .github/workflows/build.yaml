@@ -10,27 +10,34 @@ jobs:
     runs-on: windows-latest
     name: Build
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-    - uses: actions/cache@v4
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget
-    - name: Build
-      run: make build
-      working-directory: ${{ env.PATH_SOURCE }}
-    - name: Test
-      run: make test
-      working-directory: ${{ env.PATH_SOURCE }}
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
-...
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+      - name: Build
+        run: make build
+        working-directory: ${{ env.PATH_SOURCE }}
+      - name: Test
+        run: make test
+        working-directory: ${{ env.PATH_SOURCE }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
+      - name: Install GitHub Package Tool
+        if: github.event_name != 'pull_request'
+        run: dotnet tool install gpr -g
+      - name: Publish Nuget Packages
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          gpr push ${{ env.PATH_BUILD }}/ExtendedProcess.Library.csproj/ExtendedProcess.Library.*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
