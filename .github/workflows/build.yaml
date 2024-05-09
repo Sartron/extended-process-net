@@ -11,34 +11,34 @@ jobs:
     name: Build
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
       - uses: actions/cache@v4
         with:
-          path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
+          path: ~/.nuget/packages
+          restore-keys: ${{ runner.os }}-nuget
       - name: Build
         run: make build
         working-directory: ${{ env.PATH_SOURCE }}
       - name: Test
         run: make test
         working-directory: ${{ env.PATH_SOURCE }}
-      - name: Upload artifacts
+      - name: Upload job artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
+          path: ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
       - name: Install GitHub Package Tool
         if: github.event_name != 'pull_request'
         run: dotnet tool install gpr -g
       - name: Publish Nuget Packages
         if: github.event_name != 'pull_request'
         shell: bash
-        run: |
-          gpr push ${{ env.PATH_BUILD }}/ExtendedProcess.Library.csproj/ExtendedProcess.Library.*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
         working-directory: ${{ env.PATH_SOURCE }}
+        run: |-
+          for pkg in ${{ env.PATH_BUILD }}/ExtendedProcess.Library.csproj/*.nupkg
+          do
+            gpr push ${pkg} -k ${{ secrets.GITHUB_TOKEN }} || true
+          done
