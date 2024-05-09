@@ -19,6 +19,11 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           path: ~/.nuget/packages
           restore-keys: ${{ runner.os }}-nuget
+      - name: Build Version
+        shell: bash
+        run: |
+          dotnet tool install --global minver-cli --version 5.0.0
+          echo "MINVERVERSIONOVERRIDE=$(minver --tag-prefix v)" >> ${GITHUB_ENV}
       - name: Build
         run: make build
         working-directory: ${{ env.PATH_SOURCE }}
