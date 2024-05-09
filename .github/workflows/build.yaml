@@ -30,15 +30,3 @@ jobs:
         with:
           name: build-artifacts
           path: ${{ env.PATH_SOURCE }}/${{ env.PATH_BUILD }}/*
-      - name: Install GitHub Package Tool
-        if: github.event_name != 'pull_request'
-        run: dotnet tool install gpr -g
-      - name: Publish Nuget Packages
-        if: github.event_name != 'pull_request'
-        shell: bash
-        working-directory: ${{ env.PATH_SOURCE }}
-        run: |-
-          for pkg in ${{ env.PATH_BUILD }}/ExtendedProcess.Library.csproj/*.nupkg
-          do
-            gpr push ${pkg} -k ${{ secrets.GITHUB_TOKEN }} || true
-          done

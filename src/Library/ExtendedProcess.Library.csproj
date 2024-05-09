@@ -7,6 +7,12 @@
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>ExtendedProcess</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Angel N</Authors>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>

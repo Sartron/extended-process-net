@@ -7,10 +7,13 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Authors>Angel N</Authors>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Library\ExtendedProcess.Library.csproj" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>
